@@ -1,0 +1,16 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
+      - TESTPILOT_ADMIN_PASSWORD=${TESTPILOT_ADMIN_PASSWORD:-admin123}
+      - TESTPILOT_SECRET_KEY=${TESTPILOT_SECRET_KEY:-testpilot_secret_key_2026}
+    volumes:
+      - testpilot_data:/app/backend/data
+    restart: unless-stopped
+
+volumes:
+  testpilot_data:

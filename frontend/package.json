@@ -1,0 +1,11 @@
+{
+  "name": "ai-testcase-generator-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "QA Bot Frontend",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "cd ../backend && .\\.venv\\Scripts\\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload",
+    "build": "echo [QA Bot] Frontend is static HTML/CSS/JS. No build required."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "ai-testcase-generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Powered Test Case & Automation Engineering Platform",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "cd backend && .\\.venv\\Scripts\\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload",
+    "build": "echo [QA Bot] Frontend is static HTML/CSS/JS. No build required."
+  }
+}
