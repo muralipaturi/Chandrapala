@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Environments & secrets
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+
+# Databases
+*.db
+*.db-shm
+*.db-wal
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# Backups
+*.bak
+*.backup
+*.dashboard-broken

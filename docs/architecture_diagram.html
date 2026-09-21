@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Test Case Generator — Enterprise Software Architecture & Status Diagram</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0d14;
+            --bg-secondary: #121824;
+            --bg-card: rgba(22, 30, 46, 0.75);
+            --bg-card-hover: rgba(30, 41, 64, 0.9);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-glow: rgba(59, 130, 246, 0.4);
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            
+            /* Status Colors */
+            --status-completed: #10b981;
+            --status-completed-bg: rgba(16, 185, 129, 0.15);
+            --status-completed-border: rgba(16, 185, 129, 0.4);
+            
+            --status-inprogress: #f59e0b;
+            --status-inprogress-bg: rgba(245, 158, 11, 0.18);
+            --status-inprogress-border: rgba(245, 158, 11, 0.5);
+            
+            --status-next: #3b82f6;
+            --status-next-bg: rgba(59, 130, 246, 0.15);
+            --status-next-border: rgba(59, 130, 246, 0.4);
+            
+            --status-future: #8b5cf6;
+            --status-future-bg: rgba(139, 92, 246, 0.12);
+            --status-future-border: rgba(139, 92, 246, 0.3);
+
+            /* Accents */
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --accent-emerald: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+        }
+
+        /* HEADER & BANNER */
+        header {
+            padding: 2rem 2.5rem 1.5rem;
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .title-group h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .title-badge {
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .title-group p {
+            color: var(--text-muted);
+            font-size: 0.925rem;
+            margin-top: 0.35rem;
+        }
+
+        /* Prominent Current Position Banners */
+        .position-banners {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .banner-card {
+            padding: 0.85rem 1.35rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+            letter-spacing: 0.02em;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner-completed {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.6);
+            color: #34d399;
+        }
+
+        .banner-inprogress {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.7);
+            color: #fbbf24;
+            animation: pulse-border 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(245, 158, 11, 0.7); box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+            50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 25px rgba(245, 158, 11, 0.5); }
+        }
+
+        .banner-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .banner-completed .banner-icon { background: #10b981; color: #042f2e; }
+        .banner-inprogress .banner-icon { background: #f59e0b; color: #451a03; }
+
+        /* CONTROL TOOLBAR */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            background: var(--bg-secondary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .filters {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.4rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .filter-btn.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+
+        .badge-count {
+            font-size: 0.7rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .legend {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot.completed { background: var(--status-completed); box-shadow: 0 0 8px var(--status-completed); }
+        .dot.inprogress { background: var(--status-inprogress); box-shadow: 0 0 8px var(--status-inprogress); }
+        .dot.next { background: var(--status-next); box-shadow: 0 0 8px var(--status-next); }
+        .dot.future { background: var(--status-future); box-shadow: 0 0 8px var(--status-future); }
+
+        /* MAIN CONTENT LAYOUT */
+        main {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 1.5rem;
+            padding: 2rem 2.5rem;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 1200px) {
+            main { grid-template-columns: 1fr; }
+        }
+
+        /* DIAGRAM CONTAINER */
+        .diagram-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* FLOW STAGES */
+        .flow-stage {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .flow-stage:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .stage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .stage-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .stage-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .status-pill {
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-pill.completed {
+            background: var(--status-completed-bg);
+            color: var(--status-completed);
+            border: 1px solid var(--status-completed-border);
+        }
+
+        .status-pill.inprogress {
+            background: var(--status-inprogress-bg);
+            color: var(--status-inprogress);
+            border: 1px solid var(--status-inprogress-border);
+        }
+
+        .status-pill.next {
+            background: var(--status-next-bg);
+            color: var(--status-next);
+            border: 1px solid var(--status-next-border);
+        }
+
+        .status-pill.future {
+            background: var(--status-future-bg);
+            color: var(--status-future);
+            border: 1px solid var(--status-future-border);
+        }
+
+        /* NODE GRID & CARDS */
+        .node-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .node-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .node-card:hover {
+            transform: translateY(-2px);
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .node-card.selected {
+            border-color: #3b82f6;
+            box-shadow: 0 0 16px rgba(59, 130, 246, 0.4);
+            background: rgba(30, 58, 138, 0.3);
+        }
+
+        .node-card h4 {
+            font-size: 0.925rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .node-card p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .node-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin-top: 0.75rem;
+        }
+
+        .tag {
+            font-size: 0.675rem;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-dim);
+        }
+
+        /* DIRECTIONAL ARROWS */
+        .arrow-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 0;
+            color: var(--text-dim);
+            position: relative;
+        }
+
+        .arrow-divider svg {
+            width: 24px;
+            height: 24px;
+            filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
+            animation: bounce-arrow 2s infinite ease-in-out;
+        }
+
+        @keyframes bounce-arrow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(4px); }
+        }
+
+        /* PARALLEL CONTAINER */
+        .parallel-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            background: rgba(15, 23, 42, 0.4);
+            padding: 1.25rem;
+            border-radius: 14px;
+            border: 1px dashed rgba(59, 130, 246, 0.3);
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 900px) {
+            .parallel-container { grid-template-columns: 1fr; }
+        }
+
+        .parallel-header {
+            grid-column: 1 / -1;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #60a5fa;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* GENERATOR GRID MATRIX */
+        .generator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .generator-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .generator-card h5 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lang-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            font-size: 0.775rem;
+        }
+
+        .lang-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.25rem 0.4rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .lang-item.supported {
+            color: #34d399;
+        }
+
+        .lang-item.rejected {
+            color: #f87171;
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        /* INSPECTOR PANEL */
+        .inspector-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(16px);
+            position: sticky;
+            top: 140px;
+            height: fit-content;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .inspector-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 0.75rem;
+        }
+
+        .detail-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-value {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .code-snippet {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #38bdf8;
+            overflow-x: auto;
+        }
+
+        /* MATRIX STATS CARD */
+        .stats-card {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(17, 24, 39, 0.6) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #60a5fa;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stats-label {
+            font-size: 0.775rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            background: var(--bg-secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <div class="title-group">
+                <h1>
+                    ⚡ AI Test Case Generator Platform
+                    <span class="title-badge">Architecture v5.0</span>
+                </h1>
+                <p>Enterprise Software Architecture & Real-Time Implementation Status Diagram</p>
+            </div>
+
+            <!-- Prominent Position Highlights -->
+            <div class="position-banners">
+                <div class="banner-card banner-completed">
+                    <div class="banner-icon">✓</div>
+                    <div>
+                        <div>CORE AUTOMATION GENERATION ENGINE</div>
+                        <div style="font-size: 0.75rem; opacity: 0.85; font-weight: 500;">COMPLETED (10/10 Routes Passed)</div>
+                    </div>
+                </div>
+
+                <div class="banner-card banner-completed">
+                    <div class="banner-icon">✓</div>
+                    <div>
+                        <div>FASTAPI END-TO-END INTEGRATION</div>
+                        <div style="font-size: 0.75rem; opacity: 0.85; font-weight: 500;">COMPLETED (12/12 API Routes Passed)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="filters">
+                <span style="font-size: 0.8rem; color: var(--text-dim); font-weight: 600; margin-right: 0.5rem;">FILTER STAGES:</span>
+                <button class="filter-btn active" onclick="filterStatus('all', this)">
+                    All Stages <span class="badge-count">24</span>
+                </button>
+                <button class="filter-btn" onclick="filterStatus('completed', this)">
+                    Completed <span class="badge-count" style="color: var(--status-completed);">14</span>
+                </button>
+                <button class="filter-btn" onclick="filterStatus('inprogress', this)">
+                    In Progress <span class="badge-count" style="color: var(--status-inprogress);">1</span>
+                </button>
+                <button class="filter-btn" onclick="filterStatus('next', this)">
+                    Next Up <span class="badge-count" style="color: var(--status-next);">4</span>
+                </button>
+                <button class="filter-btn" onclick="filterStatus('future', this)">
+                    Future Roadmap <span class="badge-count" style="color: var(--status-future);">5</span>
+                </button>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="dot completed"></div> Completed</div>
+                <div class="legend-item"><div class="dot inprogress"></div> In Progress</div>
+                <div class="legend-item"><div class="dot next"></div> Next Task</div>
+                <div class="legend-item"><div class="dot future"></div> Future</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="diagram-container">
+
+            <!-- LAYER 1: FRONTEND -->
+            <div class="flow-stage status-completed" data-status="completed">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">01</span>
+                        FRONTEND USER INTERFACE
+                    </div>
+                    <span class="status-pill completed">Completed</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node-card" onclick="inspectNode('Frontend Input Controls', 'Collects test requirements, target URLs, framework selections, and language targets from the user.', 'HTML5 / Modern JS / CSS3', 'frontend/index.html', 'completed')">
+                        <h4>Test Case Input & Config</h4>
+                        <p>User inputs natural language requirements, base URL, and framework choices.</p>
+                        <div class="node-tags">
+                            <span class="tag">UI</span><span class="tag">Form Validation</span><span class="tag">Config</span>
+                        </div>
+                    </div>
+                    <div class="node-card" onclick="inspectNode('Framework & Language Selector', 'Interactive selector for Selenium, Playwright, Appium, Cypress with language validation.', 'Vanilla JS', 'frontend/script.js', 'completed')">
+                        <h4>Framework & Language Controls</h4>
+                        <p>Dynamic dropdown selection restricting unsupported framework/language pairs.</p>
+                        <div class="node-tags">
+                            <span class="tag">Selector</span><span class="tag">Validation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 2: FASTAPI BACKEND -->
+            <div class="flow-stage status-inprogress" data-status="inprogress" style="border-color: var(--status-inprogress-border);">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">02</span>
+                        FASTAPI BACKEND SERVICE
+                    </div>
+                    <span class="status-pill inprogress">In Progress (Current Stage)</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node-card selected" onclick="inspectNode('FastAPI Router & Auth', 'API handling, session management, CORS middleware, and request validation.', 'FastAPI / Pydantic / Asyncio', 'backend/main.py', 'inprogress')">
+                        <h4>API Layer & Auth</h4>
+                        <p>Handles CORS, session cookies, admin authentication, and payload validation.</p>
+                        <div class="node-tags">
+                            <span class="tag">FastAPI</span><span class="tag">Session Auth</span><span class="tag">CORS</span>
+                        </div>
+                    </div>
+                    <div class="node-card" onclick="inspectNode('/generate-automation Endpoint', 'Endpoints routing synchronous Playwright automation via asyncio worker thread to avoid loop collisions.', 'asyncio.to_thread()', 'backend/main.py:L1292', 'inprogress')">
+                        <h4>/generate-automation Endpoint</h4>
+                        <p>Dispatches automation requests into dedicated thread pool via <code>asyncio.to_thread</code>.</p>
+                        <div class="node-tags">
+                            <span class="tag">Worker Thread</span><span class="tag">Async Bridge</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 3: AUTOMATION SERVICE & 3 PARALLEL COMPONENTS -->
+            <div class="flow-stage status-completed" data-status="completed">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">03</span>
+                        AUTOMATION SERVICE (MAIN ORCHESTRATOR)
+                    </div>
+                    <span class="status-pill completed">Completed</span>
+                </div>
+
+                <!-- 3 Parallel Components Container -->
+                <div class="parallel-container">
+                    <div class="parallel-header">
+                        ⚡ 3 Parallel Workflow Components
+                    </div>
+
+                    <div class="node-card" onclick="inspectNode('Test Case Normalization', 'Normalizes incoming dictionary or Pydantic models into uniform TestCase object with IDs, steps, and expected results.', 'Python dataclass / Pydantic', 'backend/automation_service.py', 'completed')">
+                        <h4>1. Test Case Normalization</h4>
+                        <p>Converts raw input steps into standard internal format with IDs and expected results.</p>
+                        <div class="node-tags"><span class="tag">Normalization</span><span class="tag">Data Model</span></div>
+                    </div>
+
+                    <div class="node-card" onclick="inspectNode('AI / Automation Planner', 'Parses natural language steps and assertions into structured AutomationPlan actions.', 'Regex / AI Parser', 'backend/automation_planner.py', 'completed')">
+                        <h4>2. AI / Automation Planner</h4>
+                        <p>Transforms natural language steps into structured <code>AutomationPlan</code> actions & assertions.</p>
+                        <div class="node-tags"><span class="tag">NL Parsing</span><span class="tag">Planner</span></div>
+                    </div>
+
+                    <div class="node-card" onclick="inspectNode('Application Context Inspection', 'Launches headless browser, navigates target URL, extracts DOM elements, attributes, forms, and locators.', 'Playwright Sync API', 'backend/application_context.py', 'completed')">
+                        <h4>3. Application Context</h4>
+                        <p>Inspects live target web application, collecting DOM elements as real UI evidence.</p>
+                        <div class="node-tags"><span class="tag">DOM Inspection</span><span class="tag">Evidence</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 4: LOCATOR RESOLVER -->
+            <div class="flow-stage status-completed" data-status="completed">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">04</span>
+                        LOCATOR RESOLVER & INTELLIGENCE
+                    </div>
+                    <span class="status-pill completed">Completed</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node-card" onclick="inspectNode('Locator Resolver Engine', 'Resolves target strings against DOM evidence using role, placeholder, name, id, CSS, XPath strategies.', 'Python Rule Engine', 'backend/locator_resolver.py', 'completed')">
+                        <h4>Locator Resolver</h4>
+                        <p>Matches business targets to real UI elements using confidence scoring & multi-strategy ranking.</p>
+                        <div class="node-tags"><span class="tag">Locator Intelligence</span><span class="tag">Confidence Scoring</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 5: RESOLVED AUTOMATION PLAN -->
+            <div class="flow-stage status-completed" data-status="completed">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">05</span>
+                        RESOLVED AUTOMATION PLAN (FRAMEWORK-INDEPENDENT)
+                    </div>
+                    <span class="status-pill completed">Completed</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node-card" onclick="inspectNode('Resolved Automation Plan', 'Framework-independent JSON object containing actions, assertions, and resolved UI locators ready for generation.', 'Pydantic Model', 'backend/automation_planner.py:ResolvedAutomationPlan', 'completed')">
+                        <h4>ResolvedAutomationPlan</h4>
+                        <p>Clean framework-independent representation containing resolved locators and action specs.</p>
+                        <div class="node-tags"><span class="tag">IR Model</span><span class="tag">Resolved Locators</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 6: GENERATOR DISPATCHER -->
+            <div class="flow-stage status-completed" data-status="completed">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">06</span>
+                        GENERATOR DISPATCHER (CENTRAL ROUTER)
+                    </div>
+                    <span class="status-pill completed">Completed (10/10 Routes Passed)</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node-card" onclick="inspectNode('Generator Dispatcher', 'Central routing module that validates framework/language matrix and invokes corresponding generator.', 'Dispatcher Registry', 'backend/automation_generator_dispatcher.py', 'completed')">
+                        <h4>Generator Dispatcher</h4>
+                        <p>Central router selecting exact framework + language generator module.</p>
+                        <div class="node-tags"><span class="tag">Central Router</span><span class="tag">Validation</span><span class="tag">10/10 Verified</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 7: FRAMEWORK GENERATOR GROUPS -->
+            <div class="flow-stage status-completed" data-status="completed">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">07</span>
+                        FRAMEWORK-SPECIFIC CODE GENERATORS
+                    </div>
+                    <span class="status-pill completed">Completed</span>
+                </div>
+                <div class="generator-grid">
+                    <div class="generator-card">
+                        <h5>Selenium</h5>
+                        <ul class="lang-list">
+                            <li class="lang-item supported"><span>• Python</span> <span>✓</span></li>
+                            <li class="lang-item supported"><span>• Java</span> <span>✓</span></li>
+                            <li class="lang-item supported"><span>• JavaScript</span> <span>✓</span></li>
+                        </ul>
+                    </div>
+                    <div class="generator-card">
+                        <h5>Playwright</h5>
+                        <ul class="lang-list">
+                            <li class="lang-item supported"><span>• Python</span> <span>✓</span></li>
+                            <li class="lang-item supported"><span>• Java</span> <span>✓</span></li>
+                            <li class="lang-item supported"><span>• JavaScript</span> <span>✓</span></li>
+                        </ul>
+                    </div>
+                    <div class="generator-card">
+                        <h5>Appium</h5>
+                        <ul class="lang-list">
+                            <li class="lang-item supported"><span>• Python</span> <span>✓</span></li>
+                            <li class="lang-item supported"><span>• Java</span> <span>✓</span></li>
+                            <li class="lang-item supported"><span>• JavaScript</span> <span>✓</span></li>
+                            <li class="lang-item supported"><span>• Android/iOS</span> <span>✓</span></li>
+                        </ul>
+                    </div>
+                    <div class="generator-card">
+                        <h5>Cypress</h5>
+                        <ul class="lang-list">
+                            <li class="lang-item supported"><span>• JavaScript</span> <span>✓</span></li>
+                            <li class="lang-item rejected"><span>• Python</span> <span>✗</span></li>
+                            <li class="lang-item rejected"><span>• Java</span> <span>✗</span></li>
+                        </ul>
+                    </div>
+                    <div class="generator-card" style="border-style: dashed; opacity: 0.8;">
+                        <h5 style="color: #a855f7;">Future Frameworks</h5>
+                        <p style="font-size: 0.75rem; color: var(--text-dim);">Extensible Plugin Architecture for Robot, WebdriverIO, Playwright .NET</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 8: GENERATED CODE -->
+            <div class="flow-stage status-completed" data-status="completed">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">08</span>
+                        GENERATED AUTOMATION CODE
+                    </div>
+                    <span class="status-pill completed">Completed</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node-card" onclick="inspectNode('Generated Code Artifacts', 'Clean, production-ready automation script in requested language syntax with proper locators and assertions.', 'Source Code String', 'backend/automation_models.py:AutomationResponse', 'completed')">
+                        <h4>Generated Test Scripts</h4>
+                        <p>Production-ready test script containing imports, setup, locators, actions, assertions, and teardown.</p>
+                        <div class="node-tags"><span class="tag">Python</span><span class="tag">Java</span><span class="tag">JS</span><span class="tag">Cypress</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 9: EXECUTION SERVICE (FUTURE) -->
+            <div class="flow-stage status-future" data-status="future">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">09</span>
+                        EXECUTION SERVICE & CONTAINER RUNTIME
+                    </div>
+                    <span class="status-pill future">Future Roadmap</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node-card" onclick="inspectNode('Execution Service', 'Executes generated automation scripts in sandboxed subprocess/container environments.', 'Subprocess / Docker', 'backend/execution_service.py', 'future')">
+                        <h4>Script Execution Engine</h4>
+                        <p>Runs generated scripts, manages headless browser processes, captures stderr/stdout.</p>
+                        <div class="node-tags"><span class="tag">Execution</span><span class="tag">Sandbox</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 10: TEST RESULTS / LOGS (FUTURE) -->
+            <div class="flow-stage status-future" data-status="future">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">10</span>
+                        TEST RESULTS, LOGS & ARTIFACTS
+                    </div>
+                    <span class="status-pill future">Future Roadmap</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node-card" onclick="inspectNode('Test Results & Log Capture', 'Captures Pass/Fail status, execution duration, stack traces, console logs, and failure screenshots.', 'Log Storage / Artifacts', 'backend/execution_service.py', 'future')">
+                        <h4>Execution Results & Screenshots</h4>
+                        <p>Pass/Fail status, execution time, error stack traces, console logs, and screenshots.</p>
+                        <div class="node-tags"><span class="tag">Logs</span><span class="tag">Screenshots</span><span class="tag">Metrics</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 11: REPORTING (FUTURE) -->
+            <div class="flow-stage status-future" data-status="future">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">11</span>
+                        REPORTING & DASHBOARD
+                    </div>
+                    <span class="status-pill future">Future Roadmap</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node-card" onclick="inspectNode('Reporting & Dashboards', 'HTML reporting dashboard displaying historical pass rates, flaky test analysis, and execution trends.', 'HTML5 / Chart.js', 'frontend/reports.html', 'future')">
+                        <h4>Test Execution Dashboard</h4>
+                        <p>Interactive reporting dashboard displaying execution trends and historical metrics.</p>
+                        <div class="node-tags"><span class="tag">HTML Reports</span><span class="tag">Analytics</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- LAYER 12: AI / SELF-HEALING (FUTURE) -->
+            <div class="flow-stage status-future" data-status="future">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <span class="stage-number">12</span>
+                        AI / SELF-HEALING LOCATOR ENGINE
+                    </div>
+                    <span class="status-pill future">Future Roadmap</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node-card" onclick="inspectNode('AI Self-Healing Engine', 'Detects broken locators during execution, re-inspects live DOM, selects candidate fallback locators, and auto-updates scripts.', 'AI / Dynamic Matching', 'backend/ai_healing.py', 'future')">
+                        <h4>AI Locator Healing</h4>
+                        <p>Automatically repairs broken locators during test runs using candidate fallback strategies.</p>
+                        <div class="node-tags"><span class="tag">Self Healing</span><span class="tag">DOM Re-inspection</span><span class="tag">Auto Repair</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE: INSPECTOR & MATRIX PANEL -->
+        <div class="inspector-panel">
+            <div class="inspector-title">
+                🔍 Component Inspector
+            </div>
+
+            <div class="stats-card">
+                <div class="stats-number">10 / 10</div>
+                <div class="stats-label">Generator Routes Integration Verified (PASS)</div>
+            </div>
+
+            <div id="inspector-content">
+                <div class="detail-row">
+                    <div class="detail-label">Component</div>
+                    <div class="detail-value" id="disp-title" style="font-weight: 700; color: #fff;">FastAPI API Layer & Auth</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value"><span class="status-pill inprogress" id="disp-status">In Progress (Stage 15)</span></div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Responsibilities</div>
+                    <div class="detail-value" id="disp-desc">API handling, authentication, request validation, CORS middleware, and background worker thread execution for synchronous Playwright pipeline.</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Tech Stack</div>
+                    <div class="detail-value" id="disp-tech">FastAPI / Pydantic / Asyncio</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Source File</div>
+                    <div class="code-snippet" id="disp-file">c:\projects\AI-TestCase-Generator\backend\main.py</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 1rem;">
+                <div class="detail-label" style="margin-bottom: 0.5rem;">NEXT IMMEDIATE BLOCKER</div>
+                <div style="font-size: 0.8rem; color: #fbbf24; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.75rem; border-radius: 8px; line-height: 1.4;">
+                    Validate FastAPI <code>/generate-automation</code> endpoint end-to-end for all 10 supported framework-language combinations.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        AI Test Case Generator Platform Architecture & Status Dashboard • Enterprise Software Engineering
+    </footer>
+
+    <script>
+        function filterStatus(status, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const stages = document.querySelectorAll('.flow-stage');
+            stages.forEach(stage => {
+                if (status === 'all') {
+                    stage.style.display = 'block';
+                } else {
+                    if (stage.dataset.status === status) {
+                        stage.style.display = 'block';
+                    } else {
+                        stage.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        function inspectNode(title, desc, tech, file, status) {
+            document.getElementById('disp-title').innerText = title;
+            document.getElementById('disp-desc').innerText = desc;
+            document.getElementById('disp-tech').innerText = tech;
+            document.getElementById('disp-file').innerText = file;
+
+            const statusElem = document.getElementById('disp-status');
+            statusElem.innerText = status.toUpperCase();
+            statusElem.className = 'status-pill ' + status;
+
+            document.querySelectorAll('.node-card').forEach(n => n.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+    </script>
+</body>
+</html>

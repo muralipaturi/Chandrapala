@@ -1,0 +1,16 @@
+﻿{
+    "base_url":  "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+    "language":  "python",
+    "framework":  "playwright",
+    "test_case":  {
+                      "id":  "TC-API-001",
+                      "expected_result":  "Password field is visible",
+                      "type":  "functional",
+                      "priority":  "High",
+                      "steps":  [
+                                    "Enter username",
+                                    "Enter password"
+                                ],
+                      "title":  "Verify login fields"
+                  }
+}

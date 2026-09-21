@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>QA Bot — AI QA Automation Platform</title>
+    <meta name="description" content="AI-Powered Test Case Generation & Execution Automation Platform">
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- =====================================================
+         SIDEBAR NAVIGATION
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">⚡</div>
+            <div>
+                <div class="brand-name">QA Bot</div>
+                <div class="brand-subtitle">AI QA Automation</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <!-- DASHBOARD & PROJECTS (COMMENTED OUT FOR LATER UNCOMMENTING)
+            <button class="nav-item" id="navDashboard" type="button" onclick="showSection('dashboard')">
+                <span class="nav-icon">🏠</span>
+                <span>Dashboard</span>
+            </button>
+
+            <button class="nav-item" id="navProjects" type="button" onclick="showSection('projects')">
+                <span class="nav-icon">📁</span>
+                <span>Projects</span>
+            </button>
+            -->
+
+            <button class="nav-item active" id="navGenerator" type="button" onclick="showSection('generator')">
+                <span class="nav-icon">🧪</span>
+                <span>Test Generator</span>
+            </button>
+
+            <button class="nav-item" id="navTestCases" type="button" onclick="showSection('testCases')">
+                <span class="nav-icon">📋</span>
+                <span>Test Cases</span>
+            </button>
+
+            <button class="nav-item" id="navAutomation" type="button" onclick="showSection('automation')">
+                <span class="nav-icon">⚙️</span>
+                <span>Automation Studio</span>
+            </button>
+
+            <button class="nav-item" id="navResults" type="button" onclick="showSection('results')">
+                <span class="nav-icon">📊</span>
+                <span>Results & Reports</span>
+            </button>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="connection-status">
+                <span class="status-dot" id="connectionDot"></span>
+                <span id="connectionText">Checking backend...</span>
+            </div>
+            <div class="version">TestPilot v5.0 Enterprise</div>
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN WORKSPACE AREA
+         ===================================================== -->
+
+    <main class="main-content">
+
+        <!-- =================================================
+             TOP BAR & CONTEXT SELECTOR
+             ================================================= -->
+
+        <header class="topbar">
+            <div>
+                <h1 id="pageTitle">AI Test Case Generator</h1>
+                <p id="pageSubtitle">Generate test cases from business requirements, URLs, and screenshots.</p>
+            </div>
+
+            <div class="topbar-actions">
+                <button class="icon-button" type="button" title="Swagger API Docs" onclick="openSwagger()">
+                    <span>API Docs</span>
+                </button>
+
+                <button class="icon-button danger-icon-button" type="button" title="Logout" onclick="logoutUser()">
+                    <span>Logout</span>
+                </button>
+            </div>
+        </header>
+
+
+        <!-- =========================================================================
+             DASHBOARD & PROJECTS SECTIONS (COMMENTED OUT FOR LATER UNCOMMENTING)
+             =========================================================================
+        <section class="page-section" id="dashboardSection">
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-label">Saved Test Cases</div>
+                    <div class="dashboard-card-value" id="dashboardTestCases">0</div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-label">Automation Scripts</div>
+                    <div class="dashboard-card-value" id="dashboardAutomations">0</div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-label">Total Executions</div>
+                    <div class="dashboard-card-value" id="dashboardExecutions">0</div>
+                </div>
+
+                <div class="dashboard-card success-card">
+                    <div class="dashboard-card-label">Passed</div>
+                    <div class="dashboard-card-value" id="dashboardPassed">0</div>
+                </div>
+
+                <div class="dashboard-card danger-card">
+                    <div class="dashboard-card-label">Failed</div>
+                    <div class="dashboard-card-value" id="dashboardFailed">0</div>
+                </div>
+
+                <div class="dashboard-card highlight-card">
+                    <div class="dashboard-card-label">Pass Rate</div>
+                    <div class="dashboard-card-value" id="dashboardPassRate">0%</div>
+                </div>
+            </div>
+
+            <div class="dashboard-panel">
+                <div class="dashboard-panel-header">
+                    <h2>Active Application Context</h2>
+                    <button class="small-button" onclick="showSection('projects')">Manage Projects</button>
+                </div>
+                <div class="dashboard-application">
+                    <div>
+                        <strong>Application Name</strong>
+                        <span id="dashboardApplication">Customer Web App</span>
+                    </div>
+                    <div>
+                        <strong>Target Environment</strong>
+                        <span id="dashboardEnvironment" class="badge badge-env">QA</span>
+                    </div>
+                    <div>
+                        <strong>Base URL</strong>
+                        <span id="dashboardUrl">https://opensource-demo.orangehrmlive.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-panel">
+                <div class="dashboard-panel-header">
+                    <h2>Recent Execution History</h2>
+                    <button class="small-button" onclick="showSection('results')">View All Results</button>
+                </div>
+                <div id="dashboardRecentExecutions" class="dashboard-empty">
+                    No execution history recorded yet. Generate and run test cases to view analytics.
+                </div>
+            </div>
+
+        </section>
+
+        <section class="page-section" id="projectsSection">
+
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2>Project & Application Workspace</h2>
+                        <p>Manage multi-project QA test suites, target application URLs and environments.</p>
+                    </div>
+                    <button class="primary-button" onclick="openCreateProjectModal()">+ New Project</button>
+                </div>
+
+                <div class="projects-list-grid" id="projectsListGrid">
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <div>
+                        <h2>Target Applications</h2>
+                        <p>Configure web or mobile application entry points for test execution.</p>
+                    </div>
+                    <button class="secondary-button" onclick="openCreateAppModal()">+ Add Application</button>
+                </div>
+
+                <div class="applications-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>App Name</th>
+                                <th>Project</th>
+                                <th>Base URL</th>
+                                <th>Environment</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applicationsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+        ========================================================================= -->
+
+
+        <!-- =================================================
+             3. TEST GENERATOR SECTION
+             ================================================= -->
+
+        <section class="page-section active" id="generatorSection">
+
+            <div class="card input-card">
+                <div class="card-header">
+                    <div>
+                        <h2>AI Test Case Generator</h2>
+                        <p>Provide business requirements, application URL, and optional UI screenshots for AI analysis.</p>
+                    </div>
+                    <span class="step-badge">STEP 01</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="requirement">Requirement Specification <span class="required">*</span></label>
+                    <textarea id="requirement" class="form-control requirement-box" rows="5" placeholder="Example: Verify user login with valid credentials redirects to dashboard. Verify invalid login displays 'Invalid credentials' error message."></textarea>
+                    <div class="field-footer">
+                        <span>Describe expected user flows, valid inputs, and error conditions.</span>
+                        <span id="requirementCount">0 / 5000</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="baseUrl">Application Base URL <span class="optional">Optional</span></label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">🔗</span>
+                        <input id="baseUrl" class="form-control" type="url" placeholder="https://opensource-demo.orangehrmlive.com/web/index.php/auth/login">
+                    </div>
+                    <div class="field-hint">Optional • Used for live UI DOM inspection and web test execution.</div>
+                </div>
+
+                <div class="form-group">
+                    <div class="label-row">
+                        <label>UI Screenshots Context</label>
+                        <span class="optional">Optional • Up to 5 images</span>
+                    </div>
+
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" id="screenshotInput" accept="image/png,image/jpeg,image/webp,image/bmp" multiple hidden>
+                        <div class="upload-icon">⬆️</div>
+                        <div class="upload-title">Drop screenshots here or click to browse</div>
+                        <div class="upload-subtitle">PNG · JPG · JPEG · WEBP · BMP</div>
+                    </div>
+
+                    <div class="screenshot-grid" id="screenshotGrid"></div>
+                </div>
+
+                <div class="generate-row">
+                    <button class="primary-button" id="generateButton" type="button" onclick="generateTestCases()">
+                        <span id="generateButtonIcon">✨</span>
+                        <span id="generateButtonText">Generate Test Cases</span>
+                    </button>
+                </div>
+
+                <div class="error-box hidden" id="generatorError"></div>
+            </div>
+
+            <!-- Test Cases Results -->
+            <div class="card test-case-card hidden" id="testCaseCard">
+                <div class="card-header">
+                    <div>
+                        <h2>Generated QA Test Suite</h2>
+                        <p id="testCaseSummary">Complete test scenario matrix. Toggle matrix view or select a case for automation.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" class="small-button primary-button active" id="btnViewCards" onclick="switchTestCaseView('cards', 'generator')">Cards View</button>
+                        <button type="button" class="small-button secondary-button" id="btnViewMatrix" onclick="switchTestCaseView('matrix', 'generator')">QA Matrix Table</button>
+                        <button type="button" class="small-button secondary-button" id="btnExportCSV" onclick="exportQAMatrixCSV('generator')">Export Matrix (CSV)</button>
+                        <span class="count-badge" id="testCaseCount">0</span>
+                    </div>
+                </div>
+
+                <div class="test-case-list" id="testCaseList"></div>
+
+                <div class="matrix-table-container hidden" id="matrixTableContainer" style="overflow-x: auto; margin-top: 15px;">
+                    <table class="matrix-table" id="matrixTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.05); text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <th style="padding: 10px;">Test ID</th>
+                                <th style="padding: 10px;">Priority</th>
+                                <th style="padding: 10px;">Test Type</th>
+                                <th style="padding: 10px;">Test Scenario</th>
+                                <th style="padding: 10px;">Preconditions</th>
+                                <th style="padding: 10px;">Test Steps</th>
+                                <th style="padding: 10px;">Expected Result</th>
+                                <th style="padding: 10px;">Test Data</th>
+                                <th style="padding: 10px;">Req ID</th>
+                                <th style="padding: 10px;">Status</th>
+                                <th style="padding: 10px;">Remarks</th>
+                                <th style="padding: 10px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrixTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             4. TEST CASES REPOSITORY SECTION
+             ================================================= -->
+
+        <section class="page-section" id="testCasesSection">
+
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2>Test Case Repository</h2>
+                        <p>Database store of generated test cases. Default view displays all stored test cases.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" class="small-button primary-button active" id="btnRepoCards" onclick="switchTestCaseView('cards', 'repository')">Cards View</button>
+                        <button type="button" class="small-button secondary-button" id="btnRepoMatrix" onclick="switchTestCaseView('matrix', 'repository')">QA Matrix Table</button>
+                        <button type="button" class="small-button secondary-button" id="btnRepoExportCSV" onclick="exportQAMatrixCSV('repository')">Export CSV</button>
+                        <button type="button" class="secondary-button" onclick="exportTestCasesJSON()">Export JSON</button>
+                        <button type="button" class="secondary-button danger-button" onclick="clearRepositoryHistory()">Clear All History</button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <select id="tcScopeFilter" class="filter-select" onchange="filterTestCasesRepository()">
+                        <option value="all">All Stored Test Cases (Database)</option>
+                        <option value="latest">Latest Generated Run Only</option>
+                    </select>
+
+                    <input type="text" id="tcSearchInput" class="search-input" placeholder="Search by title, ID, or step..." oninput="filterTestCasesRepository()">
+                    
+                    <select id="tcPriorityFilter" class="filter-select" onchange="filterTestCasesRepository()">
+                        <option value="">All Priorities</option>
+                        <option value="High">High Priority</option>
+                        <option value="Medium">Medium Priority</option>
+                        <option value="Low">Low Priority</option>
+                    </select>
+
+                    <select id="tcTypeFilter" class="filter-select" onchange="filterTestCasesRepository()">
+                        <option value="">All Types</option>
+                        <option value="functional">Functional</option>
+                        <option value="integration">Integration</option>
+                        <option value="workflow">Workflow</option>
+                        <option value="negative">Negative</option>
+                    </select>
+                </div>
+
+                <div class="repository-list test-case-list" id="repositoryList">
+                    <!-- Dynamic Saved Test Cases -->
+                </div>
+
+                <div class="matrix-table-container hidden" id="repoMatrixContainer" style="overflow-x: auto; margin-top: 15px;">
+                    <table class="matrix-table" id="repoMatrixTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.05); text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <th style="padding: 10px;">Test ID</th>
+                                <th style="padding: 10px;">Priority</th>
+                                <th style="padding: 10px;">Test Type</th>
+                                <th style="padding: 10px;">Test Scenario</th>
+                                <th style="padding: 10px;">Preconditions</th>
+                                <th style="padding: 10px;">Test Steps</th>
+                                <th style="padding: 10px;">Expected Result</th>
+                                <th style="padding: 10px;">Test Data</th>
+                                <th style="padding: 10px;">Req ID</th>
+                                <th style="padding: 10px;">Status</th>
+                                <th style="padding: 10px;">Remarks</th>
+                                <th style="padding: 10px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="repoMatrixTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             5. AUTOMATION STUDIO SECTION
+             ================================================= -->
+
+        <section class="page-section" id="automationSection">
+
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2>Automation Code Generator</h2>
+                        <p>Convert selected test case into clean, production-ready automation scripts.</p>
+                    </div>
+                    <span class="step-badge">STEP 02</span>
+                </div>
+
+                <div class="selected-test-case" id="selectedTestCase">
+                    <div class="empty-selection">
+                        <div class="empty-icon">🧪</div>
+                        <h3>No Test Case Selected</h3>
+                        <p>Select a test case from the Test Generator or Test Case Repository to generate automation code.</p>
+                        <button class="secondary-button" type="button" onclick="showSection('generator')">Go to Test Generator</button>
+                    </div>
+                </div>
+
+                <div class="automation-options" id="automationOptions">
+                    <div class="form-group">
+                        <label for="framework">Automation Framework</label>
+                        <select id="framework" class="form-control" onchange="updateLanguageOptions()">
+                            <option value="playwright">Playwright</option>
+                            <option value="selenium">Selenium</option>
+                            <option value="appium">Appium (Mobile)</option>
+                            <option value="cypress">Cypress</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="language">Programming Language</label>
+                        <select id="language" class="form-control">
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="javascript">JavaScript</option>
+                        </select>
+                    </div>
+
+                    <button class="primary-button" type="button" id="automationButton" onclick="generateAutomation()">
+                        <span>⚙️</span>
+                        <span id="automationButtonText">Generate Automation Code</span>
+                    </button>
+                </div>
+
+                <!-- Code Editor Container -->
+                <div class="code-section hidden" id="codeSection">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <span class="code-title">Generated Automation Code</span>
+                            <span class="code-filename" id="codeFilename">test_generated.py</span>
+                            <span class="badge badge-framework" id="codeFrameworkBadge">PLAYWRIGHT</span>
+                            <span class="badge badge-lang" id="codeLanguageBadge">PYTHON</span>
+                        </div>
+
+                        <div class="code-actions">
+                            <button class="small-button" type="button" onclick="copyCode()">Copy</button>
+                            <button class="small-button" type="button" onclick="resetCode()">Reset</button>
+                            <button class="small-button success-button" type="button" onclick="saveCode()">Save to DB</button>
+                            <button class="small-button primary-button" type="button" onclick="downloadCode()">Download File</button>
+                        </div>
+                    </div>
+
+                    <div class="code-editor-wrapper">
+                        <pre class="line-numbers" id="lineNumbers">1</pre>
+                        <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+                    </div>
+
+                    <div class="code-footer">
+                        <div class="code-footer-left">
+                            <span id="codeStatus">Ready to edit or execute</span>
+                            <span class="code-metrics" id="codeMetrics">0 lines · 0 chars</span>
+                        </div>
+                        <button class="execute-button" type="button" id="executeButton" onclick="executeAutomation()">
+                            <span>▶</span>
+                            <span id="executeButtonText">Start Execution</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="error-box hidden" id="automationError"></div>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             6. RESULTS & REPORTS SECTION
+             ================================================= -->
+
+        <section class="page-section" id="resultsSection">
+
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2>Execution Result & Failure Diagnostics</h2>
+                        <p>Review current test run status, execution duration, and failure classification breakdown.</p>
+                    </div>
+                    <span class="result-status" id="resultStatus">NOT RUN</span>
+                </div>
+
+                <div class="result-summary" id="resultSummary">
+                    <div class="result-empty">
+                        <div class="empty-icon">📊</div>
+                        <h3>No Execution Run Yet</h3>
+                        <p>Generate automation code and click <strong>Start Execution</strong> to view real-time results.</p>
+                    </div>
+                </div>
+
+                <div class="output-panels hidden" id="outputPanels">
+                    <div class="output-panel">
+                        <div class="output-header">
+                            <span>Standard Output (Console Logs)</span>
+                            <button class="small-button" type="button" onclick="copyOutput('outputText')">Copy</button>
+                        </div>
+                        <pre id="outputText" class="terminal"></pre>
+                    </div>
+
+                    <div class="output-panel">
+                        <div class="output-header">
+                            <span>Error Traceback & Diagnostics</span>
+                            <button class="small-button" type="button" onclick="copyOutput('errorText')">Copy</button>
+                        </div>
+                        <pre id="errorText" class="terminal error-terminal"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Execution History Table -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <div>
+                        <h2>Execution History Log</h2>
+                        <p>Persistent database log of past test execution runs.</p>
+                    </div>
+                    <button class="small-button" onclick="loadExecutionHistory()">Refresh History</button>
+                </div>
+
+                <div class="applications-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Execution ID</th>
+                                <th>Framework</th>
+                                <th>Language</th>
+                                <th>Status</th>
+                                <th>Failure Type</th>
+                                <th>Duration</th>
+                                <th>Executed At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="executionHistoryTableBody">
+                            <!-- Dynamic Execution History Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     MODALS
+     ========================================================= -->
+
+<!-- Create Project Modal -->
+<div class="modal-backdrop hidden" id="createProjectModal">
+    <div class="modal-card">
+        <h3>Create New Project</h3>
+        <div class="form-group">
+            <label for="newProjectName">Project Name</label>
+            <input type="text" id="newProjectName" class="form-control" placeholder="e.g. Mobile Banking Application">
+        </div>
+        <div class="form-group">
+            <label for="newProjectDesc">Description</label>
+            <textarea id="newProjectDesc" class="form-control" rows="3" placeholder="Brief project overview..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="secondary-button" onclick="closeCreateProjectModal()">Cancel</button>
+            <button class="primary-button" onclick="submitCreateProject()">Create Project</button>
+        </div>
+    </div>
+</div>
+
+<!-- Create App Modal -->
+<div class="modal-backdrop hidden" id="createAppModal">
+    <div class="modal-card">
+        <h3>Add Target Application</h3>
+        <div class="form-group">
+            <label for="newAppName">Application Name</label>
+            <input type="text" id="newAppName" class="form-control" placeholder="e.g. Admin Portal">
+        </div>
+        <div class="form-group">
+            <label for="newAppUrl">Base URL</label>
+            <input type="url" id="newAppUrl" class="form-control" placeholder="https://app.example.com/login">
+        </div>
+        <div class="form-group">
+            <label for="newAppEnv">Environment</label>
+            <select id="newAppEnv" class="form-control">
+                <option value="QA">QA</option>
+                <option value="STAGING">STAGING</option>
+                <option value="PROD">PROD</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="secondary-button" onclick="closeCreateAppModal()">Cancel</button>
+            <button class="primary-button" onclick="submitCreateApp()">Add Application</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     TOAST NOTIFICATIONS
+     ========================================================= -->
+
+<div class="toast" id="toast">
+    <span id="toastMessage">Done</span>
+</div>
+
+<script src="/script.js?v=2.0"></script>
+
+</body>
+</html>
